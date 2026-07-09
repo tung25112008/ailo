@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ứng dụng quản lý chi tiêu cá nhân thông minh với AI - Theo dõi, phân tích và tối ưu chi tiêu của bạn">
+  <title>SpendAI - Quản Lý Chi Tiêu Thông Minh</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Mobile Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- Mobile Nav Toggle -->
+  <button class="mobile-nav-toggle" id="mobile-nav-toggle">☰</button>
+
+  <div class="app">
+    <!-- ==================== SIDEBAR ==================== -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="logo-icon">💰</div>
+          <div class="logo-text">
+            <span class="logo-title">SpendAI</span>
+            <span class="logo-subtitle">Quản lý chi tiêu thông minh</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-nav">
+        <div class="nav-section-title">Tổng quan</div>
+        <div class="nav-item active" data-page="dashboard">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="add">
+          <span class="nav-icon">➕</span>
+          <span>Thêm chi tiêu</span>
+        </div>
+
+        <div class="nav-section-title">Quản lý</div>
+        <div class="nav-item" data-page="history">
+          <span class="nav-icon">📋</span>
+          <span>Lịch sử</span>
+        </div>
+        <div class="nav-item" data-page="budget">
+          <span class="nav-icon">🎯</span>
+          <span>Ngân sách</span>
+        </div>
+
+        <div class="nav-section-title">AI</div>
+        <div class="nav-item" data-page="chat">
+          <span class="nav-icon">🤖</span>
+          <span>AI Chat</span>
+        </div>
+
+        <div class="nav-section-title">Hệ thống</div>
+        <div class="nav-item" data-page="settings">
+          <span class="nav-icon">⚙️</span>
+          <span>Cài đặt</span>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-text">SpendAI v1.0 · Made with 💜</div>
+      </div>
+    </nav>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="main-content">
+
+      <!-- ========== DASHBOARD PAGE ========== -->
+      <section class="page active" id="page-dashboard">
+        <div class="page-header">
+          <h1 class="page-title" id="dashboard-greeting">Chào buổi sáng 👋</h1>
+          <p class="page-subtitle" id="dashboard-date"></p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card expense">
+            <div class="stat-card-icon">💸</div>
+            <div class="stat-card-label">Chi tiêu tháng này</div>
+            <div class="stat-card-value" id="stat-expense">0 ₫</div>
+          </div>
+          <div class="stat-card income">
+            <div class="stat-card-icon">💰</div>
+            <div class="stat-card-label">Thu nhập tháng này</div>
+            <div class="stat-card-value" id="stat-income">0 ₫</div>
+          </div>
+          <div class="stat-card balance">
+            <div class="stat-card-icon">📈</div>
+            <div class="stat-card-label">Số dư</div>
+            <div class="stat-card-value" id="stat-balance">0 ₫</div>
+          </div>
+          <div class="stat-card count">
+            <div class="stat-card-icon">🧾</div>
+            <div class="stat-card-label">Số giao dịch</div>
+            <div class="stat-card-value" id="stat-count">0</div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><span class="card-title-icon">🍩</span> Chi tiêu theo danh mục</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-pie"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><span class="card-title-icon">📊</span> Chi tiêu 7 ngày qua</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-bar"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trend Chart -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <span class="card-title"><span class="card-title-icon">📈</span> Xu hướng 6 tháng</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-trend"></canvas>
+          </div>
+        </div>
+
+        <!-- Bottom Grid: Budget + Recent -->
+        <div class="charts-grid">
+          <!-- Budget Progress -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><span class="card-title-icon">🎯</span> Ngân sách tháng này</span>
+              <button class="btn btn-ghost btn-sm" onclick="navigateTo('budget')">Quản lý</button>
+            </div>
+            <div id="dashboard-budget-progress"></div>
+          </div>
+
+          <!-- Recent Transactions -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><span class="card-title-icon">🕐</span> Giao dịch gần đây</span>
+              <button class="btn btn-ghost btn-sm" onclick="navigateTo('history')">Xem tất cả</button>
+            </div>
+            <div class="transaction-list" id="recent-transactions"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== ADD TRANSACTION PAGE ========== -->
+      <section class="page" id="page-add">
+        <div class="page-header">
+          <h1 class="page-title"><span class="page-title-gradient">Thêm chi tiêu</span></h1>
+          <p class="page-subtitle">Nhập nhanh bằng AI hoặc điền form thủ công</p>
+        </div>
+
+        <!-- AI Quick Input -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <span class="card-title"><span class="card-title-icon">🤖</span> Nhập nhanh bằng AI</span>
+          </div>
+          <div class="ai-input-wrapper">
+            <span class="ai-input-icon">✨</span>
+            <input type="text" class="ai-input" id="ai-input"
+              placeholder='Ví dụ: "ăn phở 50k" hoặc "grab đi làm 25 nghìn"'>
+            <span class="ai-input-hint">Enter ↵</span>
+          </div>
+          <div class="ai-preview" id="ai-preview">
+            <div class="ai-preview-title">✨ AI đã phân tích:</div>
+            <div id="ai-preview-content"></div>
+          </div>
+        </div>
+
+        <div class="divider">hoặc nhập thủ công</div>
+
+        <!-- Manual Form -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title" id="add-form-title">Nhập thông tin</span>
+          </div>
+          <form id="add-form">
+            <!-- Type Toggle -->
+            <div class="type-toggle">
+              <button type="button" class="type-toggle-btn active" data-type="expense">💸 Chi tiêu</button>
+              <button type="button" class="type-toggle-btn" data-type="income">💰 Thu nhập</button>
+            </div>
+
+            <!-- Amount -->
+            <div class="form-group">
+              <label class="form-label" for="add-amount">Số tiền (₫) *</label>
+              <input type="number" class="form-input" id="add-amount" placeholder="Nhập số tiền..." min="0" required>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+              <label class="form-label" for="add-description">Mô tả *</label>
+              <input type="text" class="form-input" id="add-description" placeholder="Ví dụ: Ăn phở, Grab đi làm..." required>
+            </div>
+
+            <!-- Category -->
+            <div class="form-group" id="category-group">
+              <label class="form-label">Danh mục</label>
+              <div class="category-grid" id="category-grid">
+                <div class="category-option" data-category="food">
+                  <span class="category-option-icon">🍜</span>
+                  <span class="category-option-name">Ăn uống</span>
+                </div>
+                <div class="category-option" data-category="transport">
+                  <span class="category-option-icon">🚗</span>
+                  <span class="category-option-name">Di chuyển</span>
+                </div>
+                <div class="category-option" data-category="shopping">
+                  <span class="category-option-icon">🛍️</span>
+                  <span class="category-option-name">Mua sắm</span>
+                </div>
+                <div class="category-option" data-category="entertainment">
+                  <span class="category-option-icon">🎮</span>
+                  <span class="category-option-name">Giải trí</span>
+                </div>
+                <div class="category-option" data-category="bills">
+                  <span class="category-option-icon">📄</span>
+                  <span class="category-option-name">Hóa đơn</span>
+                </div>
+                <div class="category-option" data-category="health">
+                  <span class="category-option-icon">💊</span>
+                  <span class="category-option-name">Sức khỏe</span>
+                </div>
+                <div class="category-option" data-category="education">
+                  <span class="category-option-icon">📚</span>
+                  <span class="category-option-name">Giáo dục</span>
+                </div>
+                <div class="category-option" data-category="other">
+                  <span class="category-option-icon">📦</span>
+                  <span class="category-option-name">Khác</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Date & Note -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="add-date">Ngày</label>
+                <input type="date" class="form-input" id="add-date">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="add-note">Ghi chú (tùy chọn)</label>
+                <input type="text" class="form-input" id="add-note" placeholder="Ghi chú thêm...">
+              </div>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn btn-primary btn-lg" id="add-submit-btn" style="width:100%;">
+              💾 Lưu giao dịch
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ========== HISTORY PAGE ========== -->
+      <section class="page" id="page-history">
+        <div class="page-header">
+          <h1 class="page-title"><span class="page-title-gradient">Lịch sử giao dịch</span></h1>
+          <p class="page-subtitle">Xem và quản lý tất cả giao dịch</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar">
+          <div class="filter-tabs" id="history-period-tabs">
+            <button class="filter-tab active" data-period="all">Tất cả</button>
+            <button class="filter-tab" data-period="today">Hôm nay</button>
+            <button class="filter-tab" data-period="week">Tuần này</button>
+            <button class="filter-tab" data-period="month">Tháng này</button>
+          </div>
+          <div class="search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="filter-input" id="history-search" placeholder="Tìm kiếm giao dịch...">
+          </div>
+          <select class="filter-input" id="history-category-filter" style="min-width:140px;">
+            <option value="">Tất cả danh mục</option>
+            <option value="food">🍜 Ăn uống</option>
+            <option value="transport">🚗 Di chuyển</option>
+            <option value="shopping">🛍️ Mua sắm</option>
+            <option value="entertainment">🎮 Giải trí</option>
+            <option value="bills">📄 Hóa đơn</option>
+            <option value="health">💊 Sức khỏe</option>
+            <option value="education">📚 Giáo dục</option>
+            <option value="income">💰 Thu nhập</option>
+            <option value="other">📦 Khác</option>
+          </select>
+          <select class="filter-input" id="history-type-filter" style="min-width:120px;">
+            <option value="">Tất cả loại</option>
+            <option value="expense">💸 Chi tiêu</option>
+            <option value="income">💰 Thu nhập</option>
+          </select>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-row" id="history-summary"></div>
+
+        <!-- Transaction List -->
+        <div class="transaction-list" id="history-list"></div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="history-pagination"></div>
+      </section>
+
+      <!-- ========== BUDGET PAGE ========== -->
+      <section class="page" id="page-budget">
+        <div class="page-header">
+          <h1 class="page-title"><span class="page-title-gradient">Ngân sách</span></h1>
+          <p class="page-subtitle">Thiết lập và theo dõi ngân sách chi tiêu hàng tháng</p>
+        </div>
+
+        <!-- Budget Form -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <span class="card-title"><span class="card-title-icon">💳</span> Thiết lập ngân sách tháng này</span>
+          </div>
+          <form id="budget-form">
+            <div class="budget-form-grid">
+              <div class="budget-form-item">
+                <label>💳 Tổng ngân sách</label>
+                <input type="number" id="budget-total" placeholder="0" min="0">
+              </div>
+              <div class="budget-form-item">
+                <label>🍜 Ăn uống</label>
+                <input type="number" id="budget-food" placeholder="0" min="0">
+              </div>
+              <div class="budget-form-item">
+                <label>🚗 Di chuyển</label>
+                <input type="number" id="budget-transport" placeholder="0" min="0">
+              </div>
+              <div class="budget-form-item">
+                <label>🛍️ Mua sắm</label>
+                <input type="number" id="budget-shopping" placeholder="0" min="0">
+              </div>
+              <div class="budget-form-item">
+                <label>🎮 Giải trí</label>
+                <input type="number" id="budget-entertainment" placeholder="0" min="0">
+              </div>
+              <div class="budget-form-item">
+                <label>📄 Hóa đơn</label>
+                <input type="number" id="budget-bills" placeholder="0" min="0">
+              </div>
+              <div class="budget-form-item">
+                <label>💊 Sức khỏe</label>
+                <input type="number" id="budget-health" placeholder="0" min="0">
+              </div>
+              <div class="budget-form-item">
+                <label>📚 Giáo dục</label>
+                <input type="number" id="budget-education" placeholder="0" min="0">
+              </div>
+              <div class="budget-form-item">
+                <label>📦 Khác</label>
+                <input type="number" id="budget-other" placeholder="0" min="0">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top: 12px;">💾 Lưu ngân sách</button>
+          </form>
+        </div>
+
+        <!-- Budget Progress -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><span class="card-title-icon">📊</span> Tiến độ ngân sách</span>
+          </div>
+          <div id="budget-progress-section"></div>
+        </div>
+      </section>
+
+      <!-- ========== AI CHAT PAGE ========== -->
+      <section class="page" id="page-chat">
+        <div class="page-header" style="display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <h1 class="page-title"><span class="page-title-gradient">AI Chat</span></h1>
+            <p class="page-subtitle">Hỏi đáp về chi tiêu với trợ lý AI thông minh</p>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="clearChat()">🗑️ Xóa lịch sử</button>
+        </div>
+
+        <div class="card">
+          <div class="chat-container">
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chat-messages"></div>
+
+            <!-- Suggestions -->
+            <div class="chat-suggestions">
+              <button class="chat-suggestion">Tổng chi tiêu tháng này?</button>
+              <button class="chat-suggestion">Phân tích chi tiêu</button>
+              <button class="chat-suggestion">Gợi ý tiết kiệm</button>
+              <button class="chat-suggestion">Danh mục chi nhiều nhất?</button>
+              <button class="chat-suggestion">5 giao dịch gần đây</button>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-bar">
+              <input type="text" class="chat-input" id="chat-input" placeholder="Nhập câu hỏi về chi tiêu...">
+              <button class="chat-send-btn" id="chat-send-btn">➤</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== SETTINGS PAGE ========== -->
+      <section class="page" id="page-settings">
+        <div class="page-header">
+          <h1 class="page-title"><span class="page-title-gradient">Cài đặt</span></h1>
+          <p class="page-subtitle">Tùy chỉnh ứng dụng theo ý bạn</p>
+        </div>
+
+        <!-- AI Settings -->
+        <div class="settings-section">
+          <h2 class="settings-section-title">🤖 Cài đặt AI</h2>
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Google Gemini API Key</div>
+              <div class="settings-item-desc">Lấy API key miễn phí tại <a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--color-primary-light)">aistudio.google.com</a></div>
+            </div>
+            <div class="settings-item-action">
+              <input type="password" class="settings-input" id="settings-api-key" placeholder="Nhập API key...">
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile -->
+        <div class="settings-section">
+          <h2 class="settings-section-title">👤 Hồ sơ</h2>
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Tên của bạn</div>
+              <div class="settings-item-desc">Hiển thị trên Dashboard</div>
+            </div>
+            <div class="settings-item-action">
+              <input type="text" class="settings-input" id="settings-name" placeholder="Nhập tên...">
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Management -->
+        <div class="settings-section">
+          <h2 class="settings-section-title">💾 Quản lý dữ liệu</h2>
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Xuất dữ liệu</div>
+              <div class="settings-item-desc">Tải xuống dữ liệu dạng JSON hoặc CSV</div>
+            </div>
+            <div class="settings-item-action">
+              <div class="btn-group">
+                <button class="btn btn-ghost btn-sm" id="btn-export-json">📄 JSON</button>
+                <button class="btn btn-ghost btn-sm" id="btn-export-csv">📊 CSV</button>
+              </div>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Nhập dữ liệu</div>
+              <div class="settings-item-desc">Khôi phục từ file JSON đã xuất</div>
+            </div>
+            <div class="settings-item-action">
+              <button class="btn btn-ghost btn-sm" id="btn-import">📥 Nhập JSON</button>
+              <input type="file" id="import-file-input" accept=".json" style="display:none">
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Tải dữ liệu mẫu</div>
+              <div class="settings-item-desc">Xóa và thay bằng dữ liệu demo</div>
+            </div>
+            <div class="settings-item-action">
+              <button class="btn btn-ghost btn-sm" id="btn-reset-demo">🔄 Reset Demo</button>
+            </div>
+          </div>
+          <div class="settings-item" style="border-color: rgba(239,68,68,0.2);">
+            <div class="settings-item-info">
+              <div class="settings-item-label" style="color: var(--color-red);">Xóa toàn bộ dữ liệu</div>
+              <div class="settings-item-desc">⚠️ Không thể hoàn tác</div>
+            </div>
+            <div class="settings-item-action">
+              <button class="btn btn-danger btn-sm" id="btn-clear-data">🗑️ Xóa tất cả</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- About -->
+        <div class="settings-section">
+          <h2 class="settings-section-title">ℹ️ Thông tin</h2>
+          <div class="card" style="text-align:center; padding:32px;">
+            <div style="font-size:48px; margin-bottom:12px;">💰</div>
+            <h3 style="font-size:20px; font-weight:800; margin-bottom:4px;">
+              <span style="background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">SpendAI</span>
+            </h3>
+            <p style="color:var(--text-secondary); font-size:13px; margin-bottom:12px;">Phiên bản 1.0.0</p>
+            <p style="color:var(--text-tertiary); font-size:12px;">
+              Ứng dụng quản lý chi tiêu thông minh với AI<br>
+              Dữ liệu được lưu trữ hoàn toàn trên thiết bị của bạn.
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- Transaction Detail Modal -->
+  <div class="modal-overlay" id="modal-detail">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Chi tiết giao dịch</h3>
+        <button class="modal-close" onclick="closeModal('modal-detail')">✕</button>
+      </div>
+      <div class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
