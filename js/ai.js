@@ -380,8 +380,8 @@ Trả lời:`;
   try {
     return await callGeminiAPI(prompt, settings.apiKey);
   } catch (err) {
-    console.warn('AI chat failed:', err);
-    return answerWithRules(message, stats);
+    console.error('AI chat failed:', err);
+    return `❌ Lỗi Gemini API: ${err.message}\n(Hãy kiểm tra lại xem API Key đã đúng chưa, hoặc API Key của bạn có thể đã hết hạn mức sử dụng).`;
   }
 }
 
