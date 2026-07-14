@@ -344,30 +344,38 @@ function generateRuleBasedAnalysis(stats, trend) {
 async function aiChat(message) {
   const settings = getSettings();
   const stats = getStats('month');
-  const allTransactions = getTransactions();
+  const history = getChatHistory();
 
   // Build spending context
   const context = `
 THÔNG TIN CHI TIÊU CỦA NGƯỜI DÙNG:
 - Tổng chi tháng này: ${formatCurrency(stats.totalExpense)}
 - Tổng thu tháng này: ${formatCurrency(stats.totalIncome)}
-- Số giao dịch: ${stats.transactionCount}
-- Chi trung bình/ngày: ${formatCurrency(stats.avgDaily)}
 - Danh mục: ${Object.entries(stats.byCategory).map(([c, d]) => `${CATEGORIES[c]?.name}: ${formatCurrency(d.total)}`).join(', ')}
 - 5 giao dịch gần nhất: ${stats.transactions.slice(0, 5).map(t => `${t.description} ${formatCurrency(t.amount)}`).join(', ')}
 `;
+
+  // Build history text to give AI memory
+  const historyText = history.slice(-6).map(m => `${m.role === 'user' ? 'Người dùng' : 'SpendAI'}: ${m.content}`).join('\n');
 
   if (!settings.apiKey) {
     return answerWithRules(message, stats);
   }
 
-  const prompt = `Bạn là trợ lý tài chính thông minh tên "SpendAI". Trả lời bằng tiếng Việt, thân thiện, ngắn gọn, dùng emoji.
+  const prompt = `Bạn là AI "SpendAI". Hãy trả lời tự nhiên, thân thiện và đi THẲNG VÀO CÂU HỎI của người dùng. KHÔNG trả lời vòng vo.
+
+Nguyên tắc:
+1. Nếu câu hỏi về chi tiêu, dùng dữ liệu dưới đây để trả lời.
+2. Nếu câu hỏi về chủ đề khác (trò chuyện bình thường, code, v.v.), cứ trả lời nhiệt tình, đừng từ chối.
+3. Đọc kỹ lịch sử chat để hiểu ngữ cảnh (ví dụ nếu người dùng hỏi "tại sao?", hãy xem câu trước đó).
 
 ${context}
 
-Câu hỏi: ${message}
+LỊCH SỬ CHAT GẦN ĐÂY:
+${historyText}
 
-Trả lời dựa trên dữ liệu chi tiêu thực tế của người dùng. Nếu hỏi ngoài phạm vi tài chính, nhẹ nhàng hướng lại.`;
+Người dùng hỏi: ${message}
+Trả lời:`;
 
   try {
     return await callGeminiAPI(prompt, settings.apiKey);
