@@ -57,11 +57,7 @@
           <span>Ngân sách</span>
         </div>
 
-        <div class="nav-section-title">AI</div>
-        <div class="nav-item" data-page="chat">
-          <span class="nav-icon">🤖</span>
-          <span>AI Chat</span>
-        </div>
+
 
         <div class="nav-section-title">Hệ thống</div>
         <div class="nav-item" data-page="settings">
@@ -168,24 +164,7 @@
           <p class="page-subtitle">Nhập nhanh bằng AI hoặc điền form thủ công</p>
         </div>
 
-        <!-- AI Quick Input -->
-        <div class="card" style="margin-bottom: 24px;">
-          <div class="card-header">
-            <span class="card-title"><span class="card-title-icon">🤖</span> Nhập nhanh bằng AI</span>
-          </div>
-          <div class="ai-input-wrapper">
-            <span class="ai-input-icon">✨</span>
-            <input type="text" class="ai-input" id="ai-input"
-              placeholder='Ví dụ: "ăn phở 50k" hoặc "grab đi làm 25 nghìn"'>
-            <span class="ai-input-hint">Enter ↵</span>
-          </div>
-          <div class="ai-preview" id="ai-preview">
-            <div class="ai-preview-title">✨ AI đã phân tích:</div>
-            <div id="ai-preview-content"></div>
-          </div>
-        </div>
 
-        <div class="divider">hoặc nhập thủ công</div>
 
         <!-- Manual Form -->
         <div class="card">
@@ -382,38 +361,7 @@
         </div>
       </section>
 
-      <!-- ========== AI CHAT PAGE ========== -->
-      <section class="page" id="page-chat">
-        <div class="page-header" style="display:flex; align-items:center; justify-content:space-between;">
-          <div>
-            <h1 class="page-title"><span class="page-title-gradient">AI Chat</span></h1>
-            <p class="page-subtitle">Hỏi đáp về chi tiêu với trợ lý AI thông minh</p>
-          </div>
-          <button class="btn btn-ghost btn-sm" onclick="clearChat()">🗑️ Xóa lịch sử</button>
-        </div>
 
-        <div class="card">
-          <div class="chat-container">
-            <!-- Chat Messages -->
-            <div class="chat-messages" id="chat-messages"></div>
-
-            <!-- Suggestions -->
-            <div class="chat-suggestions">
-              <button class="chat-suggestion">Tổng chi tiêu tháng này?</button>
-              <button class="chat-suggestion">Phân tích chi tiêu</button>
-              <button class="chat-suggestion">Gợi ý tiết kiệm</button>
-              <button class="chat-suggestion">Danh mục chi nhiều nhất?</button>
-              <button class="chat-suggestion">5 giao dịch gần đây</button>
-            </div>
-
-            <!-- Chat Input -->
-            <div class="chat-input-bar">
-              <input type="text" class="chat-input" id="chat-input" placeholder="Nhập câu hỏi về chi tiêu...">
-              <button class="chat-send-btn" id="chat-send-btn">➤</button>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <!-- ========== SETTINGS PAGE ========== -->
       <section class="page" id="page-settings">
@@ -422,23 +370,7 @@
           <p class="page-subtitle">Tùy chỉnh ứng dụng theo ý bạn</p>
         </div>
 
-        <!-- AI Settings -->
-        <div class="settings-section">
-          <h2 class="settings-section-title">🤖 Cài đặt AI</h2>
-          <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Google Gemini API Key</div>
-              <div class="settings-item-desc">Lấy API key miễn phí tại <a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--color-primary-light)">aistudio.google.com</a></div>
-            </div>
-            <div class="settings-item-action" style="display:flex; gap:8px;">
-              <div style="position:relative; flex:1; width: 100%;">
-                <input type="password" class="settings-input" id="settings-api-key" placeholder="Nhập API key..." style="width:100%; padding-right: 40px;">
-                <button type="button" id="btn-toggle-apikey" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:16px;">👁️</button>
-              </div>
-              <button class="btn btn-primary btn-sm" id="btn-save-apikey">Lưu</button>
-            </div>
-          </div>
-        </div>
+
 
         <!-- Profile -->
         <div class="settings-section">
