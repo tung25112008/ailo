@@ -430,8 +430,12 @@
               <div class="settings-item-label">Google Gemini API Key</div>
               <div class="settings-item-desc">Lấy API key miễn phí tại <a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--color-primary-light)">aistudio.google.com</a></div>
             </div>
-            <div class="settings-item-action">
-              <input type="password" class="settings-input" id="settings-api-key" placeholder="Nhập API key...">
+            <div class="settings-item-action" style="display:flex; gap:8px;">
+              <div style="position:relative; flex:1; width: 100%;">
+                <input type="password" class="settings-input" id="settings-api-key" placeholder="Nhập API key..." style="width:100%; padding-right: 40px;">
+                <button type="button" id="btn-toggle-apikey" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:16px;">👁️</button>
+              </div>
+              <button class="btn btn-primary btn-sm" id="btn-save-apikey">Lưu</button>
             </div>
           </div>
         </div>
@@ -444,8 +448,9 @@
               <div class="settings-item-label">Tên của bạn</div>
               <div class="settings-item-desc">Hiển thị trên Dashboard</div>
             </div>
-            <div class="settings-item-action">
-              <input type="text" class="settings-input" id="settings-name" placeholder="Nhập tên...">
+            <div class="settings-item-action" style="display:flex; gap:8px;">
+              <input type="text" class="settings-input" id="settings-name" placeholder="Nhập tên..." style="flex:1;">
+              <button class="btn btn-primary btn-sm" id="btn-save-name">Lưu</button>
             </div>
           </div>
         </div>

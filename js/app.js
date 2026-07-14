@@ -837,20 +837,46 @@ function initSettingsPage() {
   const apiKeyInput = document.getElementById('settings-api-key');
   if (apiKeyInput) {
     apiKeyInput.value = settings.apiKey || '';
-    apiKeyInput.addEventListener('change', () => {
-      saveSettings({ apiKey: apiKeyInput.value.trim() });
-      showToast('Đã lưu API Key');
-    });
+    
+    // Toggle visibility
+    const toggleBtn = document.getElementById('btn-toggle-apikey');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        if (apiKeyInput.type === 'password') {
+          apiKeyInput.type = 'text';
+          toggleBtn.textContent = '🙈';
+        } else {
+          apiKeyInput.type = 'password';
+          toggleBtn.textContent = '👁️';
+        }
+      });
+    }
+
+    // Save button
+    const saveKeyBtn = document.getElementById('btn-save-apikey');
+    if (saveKeyBtn) {
+      saveKeyBtn.addEventListener('click', () => {
+        saveSettings({ apiKey: apiKeyInput.value.trim() });
+        showToast('Đã lưu API Key');
+      });
+    }
   }
 
   // User name
   const nameInput = document.getElementById('settings-name');
   if (nameInput) {
     nameInput.value = settings.userName || '';
-    nameInput.addEventListener('change', () => {
-      saveSettings({ userName: nameInput.value.trim() });
-      showToast('Đã lưu tên');
-    });
+    
+    // Save button
+    const saveNameBtn = document.getElementById('btn-save-name');
+    if (saveNameBtn) {
+      saveNameBtn.addEventListener('click', () => {
+        saveSettings({ userName: nameInput.value.trim() });
+        showToast('Đã lưu tên');
+        // Update greeting on dashboard immediately
+        document.getElementById('dashboard-greeting').textContent = getGreeting();
+      });
+    }
   }
 
   // Export buttons
